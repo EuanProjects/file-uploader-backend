@@ -1,42 +1,27 @@
 const express = require("express");
 const router = express.Router();
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client")
+const accountController = require("../controllers/account");
+const { isAuth } = require("../middleware/authMiddleware");
 
 const prisma = new PrismaClient()
 
 // load controller
 
-passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        const user = await prisma.user.find({
-            where: {
-                username: username
-            }
-        })
-  
-        if (!user) {
-          return done(null, false, { message: "Incorrect username" });
-        }
-        if (user.password !== password) {
-          return done(null, false, { message: "Incorrect password" });
-        }
-        return done(null, user);
-      } catch(err) {
-        return done(err);
-      }
-    })
-  );
-
-
-
-
-
 // create account
-router.post("/", (req, res, next) => {
+router.post("/", async (req, res, next) => {
+
+    const accounts = await prisma.account.findUnique({
+        where: {
+            username: req.body.username
+        }
+    })
+
+    if (accounts) {
+        return res.status(400).send('Profile already exists');
+    }
+
     bcrypt.hash(req.body.password, 10, async (err, hashedPassword) => {
         try {
             const newAccount = await prisma.account.create({
@@ -52,14 +37,16 @@ router.post("/", (req, res, next) => {
     })
 });
 
+router.use(isAuth)
+
 // read account
-router.get("/", (req,res) => res.send("Hello account get"));
+router.get("/", accountController.getAccount);
 
 // update account
-router.put("/", (req,res) => res.send("Hello account update"));
+router.put("/", (req, res) => res.send("Hello account update"));
 
 // delete account
-router.delete("/", (req,res) => res.send("Hello account delete"));
+router.delete("/", (req, res) => res.send("Hello account delete"));
 
 
 module.exports = router;

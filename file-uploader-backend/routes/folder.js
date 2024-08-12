@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const { isAuth } = require("../middleware/authMiddleware");
 
+router.use(isAuth)
 // load controller
-
 
 // create folder
 router.post("/", (req,res) => res.send("Hello folder post"));

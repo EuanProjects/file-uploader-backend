@@ -15,7 +15,7 @@ datasource db {
 
 model Account {
   id String     @id @default(uuid())
-  username String
+  username String @unique 
   password String
   files    File[]
   folders  Folder[]
@@ -42,4 +42,11 @@ model File {
   dateUploaded DateTime
   account      Account  @relation(fields: [accountId], references: [id])
   accountId    String
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String  
+  expiresAt   DateTime
 }
