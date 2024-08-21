@@ -1,10 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
+const { getToken, verifyToken } = require("../middleware/authMiddleware");
 const { PrismaClient } = require("@prisma/client")
 const accountController = require("../controllers/account");
-const { isAuth } = require("../middleware/authMiddleware");
-
 const prisma = new PrismaClient()
 
 // load controller
@@ -37,10 +36,9 @@ router.post("/", async (req, res, next) => {
     })
 });
 
-router.use(isAuth)
 
 // read account
-router.get("/", accountController.getAccount);
+router.get("/", getToken, verifyToken, accountController.getAccount);
 
 // update account
 router.put("/", (req, res) => res.send("Hello account update"));

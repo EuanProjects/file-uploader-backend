@@ -1,21 +1,23 @@
 const express = require("express");
 const router = express.Router();
-const { isAuth } = require("../middleware/authMiddleware");
 
-router.use(isAuth)
 // load controller
+const folderController = require("../controllers/folder");
+const { getToken, verifyToken } = require("../middleware/authMiddleware");
+
+router.use(getToken, verifyToken)
 
 // create folder
-router.post("/", (req,res) => res.send("Hello folder post"));
+router.post("/", folderController.postFolder);
 
 // read folder
-router.get("/", (req,res) => res.send("Hello folder get"));
+router.get("/", folderController.getFolders);
 
 // update folder
-router.put("/", (req,res) => res.send("Hello folder update"));
+router.put("/:folderId", folderController.updateFolder);
 
 // delete folder
-router.delete("/", (req,res) => res.send("Hello folder delete"));
+router.delete("/:folderId", folderController.deleteFolder);
 
 
 module.exports = router;

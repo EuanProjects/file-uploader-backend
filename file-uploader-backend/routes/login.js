@@ -1,19 +1,22 @@
 const express = require("express");
 const router = express.Router();
-const bcrypt = require("bcryptjs")
 const passport = require("passport");
-const { PrismaClient } = require('@prisma/client')
-const prisma = new PrismaClient()
+const jwt = require("jsonwebtoken");
 
 
+router.post('/', function (req, res, next) {
+    passport.authenticate('local', { session: false }, (err, user, info) => {
+        if (err || !user) {
+            
+            return res.status(400).json({
+                message: info ? info.message : 'Something is not right',
+                user: user
+            });
+        }
 
-router.post("/", passport.authenticate("local"), (req, res) => {
-    console.log('Authenticated User:', req.user);
-    if (!req.user) {
-        return res.status(401).json({ message: "Authentication failed" });
-    }
-
-    return res.status(200).json({ message: "Authentication successful" });
+        const token = jwt.sign(user, process.env.SECRET, { expiresIn: "2h"});
+        return res.json({ token });
+    })(req, res);
 });
 
 

@@ -1,11 +1,24 @@
-module.exports.isAuth = (req,res, next) => {
-    if (req.isAuthenticated()) {
+const jwt = require("jsonwebtoken");
+
+module.exports.getToken = (req, res, next) => {
+    const bearerHeader = req.headers['authorization'];
+    if (typeof bearerHeader !== 'undefined') {
+        const bearer = bearerHeader.split(' ');
+        const bearerToken = bearer[1];
+        req.token = bearerToken;
         next();
     } else {
-        res.status(401).json({message: "You are not authorized to view this resource"})
+        res.sendStatus(403);
     }
 }
 
-module.exports.isAdmin = (req, res, next) => {
-
+module.exports.verifyToken = (req, res, next) => {
+    jwt.verify(req.token, process.env.SECRET, (err, authData) => {
+        if (err) {
+            res.sendStatus(403);
+        } else {
+            req.user = authData;
+            next();
+        }
+    })
 }

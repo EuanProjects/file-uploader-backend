@@ -43,10 +43,3 @@ model File {
   account      Account  @relation(fields: [accountId], references: [id])
   accountId    String
 }
-
-model Session {
-  id        String   @id
-  sid       String   @unique
-  data      String  
-  expiresAt   DateTime
-}

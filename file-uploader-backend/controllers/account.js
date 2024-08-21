@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler");
 
 exports.getAccount = asyncHandler(async (req, res) => {
-    res.json({ id: req.user.id });
+    const id = req.user.id;
+    const username = req.user.username;
+    res.json({ id, username });
 })
